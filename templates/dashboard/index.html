@@ -1,0 +1,282 @@
+{% extends "layout.html" %}
+
+{% block title %}Tableau de bord - Admin Lab_Math{% endblock %}
+
+{% block page_title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Stats Cards -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Articles publiés
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.published_posts }}</div>
+                        <div class="text-muted">Sur {{ stats.total_posts }} au total</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-newspaper fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Activités
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_activities }}</div>
+                        <div class="text-muted">À venir et en cours</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Offres actives
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_offers }}</div>
+                        <div class="text-muted">Emplois et stages</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-briefcase fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Médias
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_media }}</div>
+                        <div class="text-muted">Images et documents</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-images fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Articles récents -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Articles récents</h6>
+                <a href="{{ url_for('posts.posts_list') }}" class="btn btn-sm btn-primary">
+                    Voir tout <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for post in recent_posts %}
+                    <a href="{{ url_for('posts.edit_post', post_id=post.id) }}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ post.title }}</h6>
+                            <small class="text-muted">{{ post.created_at|datetime_format('%d/%m') }}</small>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <span class="badge bg-{{ 'success' if post.status == 'published' else 'warning' }}">
+                                    {{ post.status }}
+                                </span>
+                                <span class="badge bg-info ms-1">{{ post.post_type }}</span>
+                            </small>
+                            <small>
+                                <i class="fas fa-eye"></i> {{ post.views }}
+                                <i class="fas fa-heart ms-2"></i> {{ post.likes }}
+                            </small>
+                        </div>
+                    </a>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <p class="text-muted">Aucun article pour le moment</p>
+                        <a href="{{ url_for('posts.create_post') }}" class="btn btn-sm btn-primary">
+                            Créer un article
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activités à venir -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-success">Activités à venir</h6>
+                <a href="{{ url_for('posts.posts_list', type='activity') }}" class="btn btn-sm btn-success">
+                    Voir tout <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for activity in upcoming_activities %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ activity.title }}</h6>
+                            <small class="text-muted">{{ activity.start_date|datetime_format('%d/%m') }}</small>
+                        </div>
+                        <p class="mb-1 text-muted">{{ activity.description|excerpt(100) }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small>
+                                <span class="badge bg-{{ 'info' if activity.activity_type == 'workshop' else 'primary' }}">
+                                    {{ activity.activity_type }}
+                                </span>
+                                {% if activity.is_online %}
+                                <span class="badge bg-success ms-1">En ligne</span>
+                                {% else %}
+                                <span class="badge bg-secondary ms-1">{{ activity.location }}</span>
+                                {% endif %}
+                            </small>
+                            <small class="text-muted">
+                                {{ activity.current_participants }}/{{ activity.max_participants }}
+                            </small>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <p class="text-muted">Aucune activité à venir</p>
+                        <a href="{{ url_for('posts.create_post') }}?type=activity" class="btn btn-sm btn-success">
+                            Créer une activité
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Offres ouvertes -->
+    <div class="col-lg-12">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-warning">Offres actives</h6>
+                <a href="{{ url_for('posts.posts_list', type='offer') }}" class="btn btn-sm btn-warning">
+                    Voir tout <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Type</th>
+                                <th>Contrat</th>
+                                <th>Localisation</th>
+                                <th>Date limite</th>
+                                <th>Candidatures</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for offer in open_offers %}
+                            <tr>
+                                <td>
+                                    <strong>{{ offer.title }}</strong><br>
+                                    <small class="text-muted">{{ offer.description|excerpt(80) }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'info' if offer.offer_type == 'job' else 'success' }}">
+                                        {{ offer.offer_type }}
+                                    </span>
+                                </td>
+                                <td>{{ offer.contract_type or 'Non spécifié' }}</td>
+                                <td>
+                                    {% if offer.is_remote %}
+                                    <span class="badge bg-success">Télétravail</span>
+                                    {% else %}
+                                    {{ offer.location or 'Non spécifié' }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if offer.application_deadline %}
+                                    {{ offer.application_deadline|datetime_format('%d/%m/%Y') }}
+                                    {% else %}
+                                    <span class="text-muted">Non spécifiée</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ offer.applications_count }}</span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('posts.edit_post', post_id=offer.post_id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <p class="text-muted">Aucune offre active pour le moment</p>
+                                    <a href="{{ url_for('posts.create_post') }}?type=offer" class="btn btn-sm btn-warning">
+                                        Créer une offre
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Charger les statistiques via AJAX
+    function loadStats() {
+        $.ajax({
+            url: "{{ url_for('dashboard.api_stats') }}",
+            type: 'GET',
+            success: function(data) {
+                // Mettre à jour les statistiques si nécessaire
+                console.log('Stats loaded:', data);
+            }
+        });
+    }
+    
+    // Charger initialement
+    loadStats();
+    
+    // Recharger toutes les 60 secondes
+    setInterval(loadStats, 60000);
+});
+</script>
+{% endblock %}
