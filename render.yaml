@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: labmath-admin
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      python database/init_db.py reset
+    startCommand: gunicorn wsgi:app
+    envVars:
+      - key: FLASK_CONFIG
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: labmathdb
+          property: connectionString
+      - key: ADMIN_EMAIL
+        value: admin@labmath.com
+    healthCheckPath: /health
+    autoDeploy: true
+    
+    databases:
+      - name: labmathdb
+        databaseName: labmath_admin
+        plan: free
+    
+    domains:
+      - labmath-admin.onrender.com
+
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-XSS-Protection
+        value: 1; mode=block
+
+    routes:
+      - type: rewrite
+        source: /media/uploads/*
+        destination: /static/uploads/*
