@@ -8,12 +8,16 @@ class Config:
     """Configuration de base"""
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     
-    # Base de données
+    # Base de données - Correction pour Render
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     if SQLALCHEMY_DATABASE_URI and SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql://", 1)
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_recycle': 300,
+        'pool_pre_ping': True,
+    }
     
     # Upload
     UPLOAD_FOLDER = 'uploads'
@@ -27,7 +31,7 @@ class Config:
     API_VERSION = 'v1'
     
     # Site principal
-    MAIN_SITE_URL = 'https://labmath-scsmaubmar-org.onrender.com'
+    MAIN_SITE_URL = os.environ.get('MAIN_SITE_URL', 'https://labmath-scsmaubmar-org.onrender.com')
     
     # Admin settings
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@labmath.com')
@@ -47,6 +51,9 @@ class ProductionConfig(Config):
     # S'assurer que l'URL PostgreSQL est correcte
     if SQLALCHEMY_DATABASE_URI and SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
         SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql://", 1)
+    
+    # Forcer HTTPS en production
+    PREFERRED_URL_SCHEME = 'https'
 
 class TestingConfig(Config):
     """Configuration tests"""
@@ -58,5 +65,5 @@ config = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,
     'testing': TestingConfig,
-    'default': DevelopmentConfig
+    'default': ProductionConfig  # Par défaut production pour Render
 }

@@ -1,10 +1,8 @@
 services:
   - type: web
     name: labmath-admin
-    env: python
-    buildCommand: |
-      pip install -r requirements.txt
-      python database/init_db.py reset
+    runtime: python
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: gunicorn wsgi:app
     envVars:
       - key: FLASK_CONFIG
@@ -17,6 +15,8 @@ services:
           property: connectionString
       - key: ADMIN_EMAIL
         value: admin@labmath.com
+      - key: PYTHON_VERSION
+        value: 3.11.0  # Forcer Python 3.11 qui est plus stable
     healthCheckPath: /health
     autoDeploy: true
     
@@ -24,22 +24,3 @@ services:
       - name: labmathdb
         databaseName: labmath_admin
         plan: free
-    
-    domains:
-      - labmath-admin.onrender.com
-
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: DENY
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff
-      - path: /*
-        name: X-XSS-Protection
-        value: 1; mode=block
-
-    routes:
-      - type: rewrite
-        source: /media/uploads/*
-        destination: /static/uploads/*
