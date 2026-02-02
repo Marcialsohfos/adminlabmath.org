@@ -14,3 +14,5 @@ markdown>=3.5.1
 bleach>=6.0.0
 python-slugify>=8.0.1
 python-magic==0.4.27
+python-magic==0.4.27
+PyJWT==2.10.1
